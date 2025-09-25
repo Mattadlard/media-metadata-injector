@@ -1,0 +1,87 @@
+# Installation Guide – Media Metadata Injector
+
+This guide explains how to install and configure the **Media Metadata Injector** plugin and the optional **ExifTool** dependency.
+
+---
+
+## ⚠️ Disclaimer
+This guide provides general instructions. Server environments differ depending on your hosting provider, operating system, and security settings. If you are not comfortable managing servers, consult your hosting support before attempting installation. Incorrect commands may affect server stability.
+
+---
+
+## 1. WordPress Plugin Installation
+1. Download or clone this repository.
+2. Upload the plugin folder `media-metadata-injector/` to:
+   ```
+   wp-content/plugins/
+   ```
+3. Log into WordPress Admin → **Plugins** → Activate **Media Metadata Injector**.
+4. Done! The plugin will now inject metadata into new uploads automatically.
+
+---
+
+## 2. ExifTool Installation (Optional, Recommended)
+ExifTool allows the plugin to write metadata directly into image files. Without it, metadata is stored only in WordPress attachment meta.
+
+### A. Debian/Ubuntu Servers
+```bash
+sudo apt update
+sudo apt install libimage-exiftool-perl -y
+```
+
+### B. CentOS / AlmaLinux / Rocky Linux
+```bash
+sudo yum install perl-Image-ExifTool -y
+```
+*(On newer systems, replace `yum` with `dnf`.)*
+
+### C. Verify Installation
+```bash
+exiftool -ver
+```
+Expected output: a version number like `12.76`.
+
+### D. Manual Install (if packages unavailable)
+```bash
+cd /usr/local/bin
+sudo curl -O https://exiftool.org/Image-ExifTool-12.76.tar.gz
+sudo tar -xzf Image-ExifTool-12.76.tar.gz
+cd Image-ExifTool-12.76
+sudo perl Makefile.PL
+sudo make install
+```
+
+---
+
+## 3. Plesk Servers
+- Login to **Plesk Admin**.
+- Go to **Tools & Settings → System Updates**.
+- Search for `libimage-exiftool-perl` (Debian/Ubuntu) or `perl-Image-ExifTool` (CentOS/Rocky).
+- Install and confirm with `exiftool -ver` in Plesk command line (if enabled).
+- If your host blocks `exec()` or `shell_exec()` in PHP, ExifTool cannot be used by the plugin. In this case, the fallback (WordPress metadata only) will apply.
+
+---
+
+## 4. Testing
+- Upload a new image to WordPress.
+- Run:
+  ```bash
+  exiftool yourimage.jpg
+  ```
+- Check if title, description, and keywords are present.
+
+If ExifTool is missing, metadata can still be seen in WordPress (attachment meta), but not embedded into the actual image file.
+
+---
+
+## 5. Troubleshooting
+- **ExifTool not found:** Make sure it’s installed and accessible in `$PATH`.
+- **exec() disabled:** Ask your host if they allow enabling it. Otherwise, plugin will fallback to WordPress-only metadata.
+- **Metadata missing:** Re-run bulk injection via **Tools → Media Metadata Injector**.
+
+---
+
+## 6. Next Steps
+- Customize metadata fields in the plugin file (or future settings page).
+- (Optional) Set up a cron job to periodically reapply metadata.
+- Track plugin updates via CHANGELOG.
